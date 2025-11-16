@@ -5,15 +5,16 @@ Kompletna platforma aukcyjna podobna do Allegro, zbudowana w 2025 roku z wykorzy
 ## 🚀 Funkcjonalności
 
 ### Dla użytkowników
-- ✅ Rejestracja i logowanie użytkowników
+- ✅ Rejestracja i logowanie użytkowników (po polsku)
 - ✅ Przeglądanie i wyszukiwanie aukcji
-- ✅ Tworzenie własnych aukcji
-- ✅ Licytowanie i zakup przedmiotów
+- ✅ Tworzenie własnych aukcji z uploadem zdjęć
+- ✅ Licytowanie i zakup przedmiotów (Kup teraz/Licytuj)
 - ✅ System wiadomości między użytkownikami
 - ✅ Panel użytkownika (moje aukcje, zakupy, obserwowane)
-- ✅ System ocen i komentarzy
-- ✅ Historia transakcji
+- ✅ System ocen i komentarzy (feedback)
+- ✅ Historia transakcji i zamówień
 - ✅ Powiadomienia real-time
+- ✅ Lista obserwowanych (watchlist)
 
 ### Dla administratorów
 - ✅ Panel administratora
@@ -23,10 +24,24 @@ Kompletna platforma aukcyjna podobna do Allegro, zbudowana w 2025 roku z wykorzy
 - ✅ Statystyki i raporty
 
 ### UX/UI
-- ✅ Nowoczesny design 2025
+- ✅ Nowoczesny design 2025 (inspirowany Allegro)
 - ✅ Tryb ciemny i jasny
 - ✅ Pełna responsywność (mobile, tablet, desktop)
 - ✅ Szybki i płynny interfejs
+- ✅ Polski język interfejsu
+
+### Kategorie
+Platform zawiera kompletny zestaw kategorii podobny do Allegro:
+- 📱 **Elektronika** - Telefony, Komputery, RTV i AGD, Konsole i gry
+- 👔 **Moda** - Odzież, Obuwie, Biżuteria i zegarki
+- 🏠 **Dom i Ogród** - Meble, Ogród
+- 🚗 **Motoryzacja** - Części samochodowe, Opony i felgi
+- ⚽ **Sport i turystyka** - Rowery, Fitness
+- 👶 **Dziecko** - Zabawki
+- 📚 **Kultura i rozrywka** - Książki i komiksy
+- 🐾 **Zwierzęta** - Psy, Koty
+- 💄 **Uroda** - Kosmetyki, perfumy
+- ⚕️ **Zdrowie** - Suplementy, sprzęt medyczny
 
 ## 🛠️ Stack Technologiczny
 
