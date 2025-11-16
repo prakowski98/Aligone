@@ -1,0 +1,253 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum AuctionStatus {
+  DRAFT
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+enum AuctionType {
+  BUY_NOW
+  AUCTION
+  BOTH
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  username          String   @unique
+  password          String
+  firstName         String?
+  lastName          String?
+  avatar            String?
+  phoneNumber       String?
+  address           String?
+  city              String?
+  postalCode        String?
+  country           String?
+  role              UserRole @default(USER)
+  rating            Float    @default(0)
+  ratingCount       Int      @default(0)
+  verified          Boolean  @default(false)
+  emailVerified     Boolean  @default(false)
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  auctions          Auction[]
+  bids              Bid[]
+  sentMessages      Message[]      @relation("SentMessages")
+  receivedMessages  Message[]      @relation("ReceivedMessages")
+  reviews           Review[]       @relation("ReviewsGiven")
+  reviewsReceived   Review[]       @relation("ReviewsReceived")
+  orders            Order[]        @relation("Buyer")
+  sales             Order[]        @relation("Seller")
+  watchlist         Watchlist[]
+  notifications     Notification[]
+  refreshTokens     RefreshToken[]
+
+  @@index([email])
+  @@index([username])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  icon        String?
+  parentId    String?
+  parent      Category?  @relation("SubCategories", fields: [parentId], references: [id])
+  children    Category[] @relation("SubCategories")
+  auctions    Auction[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([slug])
+  @@index([parentId])
+}
+
+model Auction {
+  id              String        @id @default(cuid())
+  title           String
+  description     String
+  type            AuctionType
+  status          AuctionStatus @default(DRAFT)
+  startingPrice   Float
+  currentPrice    Float
+  buyNowPrice     Float?
+  reservePrice    Float?
+  quantity        Int           @default(1)
+  condition       String?
+  location        String?
+  shippingCost    Float?
+  shippingInfo    String?
+  images          String[]
+  views           Int           @default(0)
+  featured        Boolean       @default(false)
+  startDate       DateTime
+  endDate         DateTime
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  sellerId        String
+  seller          User          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  categoryId      String
+  category        Category      @relation(fields: [categoryId], references: [id])
+  bids            Bid[]
+  watchlist       Watchlist[]
+  orders          Order[]
+
+  @@index([sellerId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([endDate])
+  @@index([createdAt])
+}
+
+model Bid {
+  id         String   @id @default(cuid())
+  amount     Float
+  automatic  Boolean  @default(false)
+  maxBid     Float?
+  createdAt  DateTime @default(now())
+
+  // Relations
+  auctionId  String
+  auction    Auction  @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  bidderId   String
+  bidder     User     @relation(fields: [bidderId], references: [id], onDelete: Cascade)
+
+  @@index([auctionId])
+  @@index([bidderId])
+  @@index([createdAt])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  content    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  // Relations
+  senderId   String
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId String
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  // Relations
+  reviewerId String
+  reviewer   User     @relation("ReviewsGiven", fields: [reviewerId], references: [id], onDelete: Cascade)
+  reviewedId String
+  reviewed   User     @relation("ReviewsReceived", fields: [reviewedId], references: [id], onDelete: Cascade)
+
+  @@index([reviewerId])
+  @@index([reviewedId])
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  status          OrderStatus @default(PENDING)
+  totalAmount     Float
+  shippingAddress String
+  shippingCost    Float
+  trackingNumber  String?
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  buyerId         String
+  buyer           User        @relation("Buyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  sellerId        String
+  seller          User        @relation("Seller", fields: [sellerId], references: [id], onDelete: Cascade)
+  auctionId       String
+  auction         Auction     @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([auctionId])
+  @@index([status])
+}
+
+model Watchlist {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  auctionId String
+  auction   Auction  @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, auctionId])
+  @@index([userId])
+  @@index([auctionId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
